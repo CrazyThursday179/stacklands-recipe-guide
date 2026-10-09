@@ -33,3 +33,5 @@ python build.py
 ```
 
 The script builds the DLL and synchronizes it to the local Stacklands Mods directory.
+
+For Steam Workshop publishing, place `icon.png` in this project folder. A 512x512 PNG is recommended. After the first in-game upload, copy the generated `workshop.txt` from the local `recipe_guide` Mod folder back into this project so future uploads update the same Workshop item.
