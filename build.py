@@ -61,6 +61,13 @@ for file in COPY_FILES:
         shutil.copyfile(file, MOD_PATH / file)
     except FileNotFoundError:
         print(f"No such file: '{file}'")
+        # A deleted Workshop item leaves a stale workshop.txt behind in the
+        # local Mods folder. Remove that binding so the in-game uploader can
+        # create a new Workshop item instead of updating a missing one.
+        if file == "workshop.txt":
+            stale_workshop_file = MOD_PATH / file
+            if stale_workshop_file.exists():
+                stale_workshop_file.unlink()
 
 # copy folders
 print("syncing folders..")
