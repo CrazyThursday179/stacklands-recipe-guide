@@ -189,8 +189,10 @@ public sealed class RecipeGuideController : MonoBehaviour
                 HandleUnclaimedClick(screen);
         }
 
-        var sourceTitle = lockedSnapshot?.Title ?? screen.InfoTitle.text;
-        var sourceText = lockedSnapshot?.Text ?? screen.InfoText.text;
+        var vanillaTitle = screen.InfoTitle.text;
+        var vanillaText = screen.InfoText.text;
+        var sourceTitle = lockedSnapshot?.Title ?? vanillaTitle;
+        var sourceText = lockedSnapshot?.Text ?? vanillaText;
         IReadOnlyCollection<string> sourcePath = lockedSnapshot == null
             ? Array.Empty<string>()
             : GetMainPath();
@@ -202,8 +204,19 @@ public sealed class RecipeGuideController : MonoBehaviour
             Mouse.current?.leftButton.wasPressedThisFrame == true);
         UpdateLockPin(screen);
 
-        GameScreen.InfoBoxTitle = screen.InfoTitle.text;
-        GameScreen.InfoBoxText = screen.InfoText.text;
+        // ShowInfoBox owns these static values while the player is only
+        // hovering a vanilla UI element such as a booster-pack purchase
+        // button.  Writing the current screen text back every frame can erase
+        // that delayed hover description.  Persist the cache only when this
+        // mod is displaying a locked snapshot or has actually transformed
+        // the vanilla text with recipe links.
+        var modChangedTitle = !string.Equals(screen.InfoTitle.text, vanillaTitle, StringComparison.Ordinal);
+        var modChangedText = !string.Equals(screen.InfoText.text, vanillaText, StringComparison.Ordinal);
+        if (lockedSnapshot != null || modChangedTitle || modChangedText)
+        {
+            GameScreen.InfoBoxTitle = screen.InfoTitle.text;
+            GameScreen.InfoBoxText = screen.InfoText.text;
+        }
         if (lastScreenWidth != Screen.width || lastScreenHeight != Screen.height)
         {
             lastScreenWidth = Screen.width;
